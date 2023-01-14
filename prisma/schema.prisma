@@ -17,6 +17,34 @@ model Jwt {
   created_at      DateTime  @default(now())
 }
 
+model Post {
+  id              Int       @id @default(autoincrement())
+  user_id         Int
+  content         String
+  created_at      DateTime  @default(now())
+}
+
+model Like {
+  id              Int       @id @default(autoincrement())
+  user_id         Int
+  post_id         Int
+  created_at      DateTime  @default(now())
+}
+
+model Hashtag {
+  id              Int       @id @default(autoincrement())
+  post_id         Int
+  hastag          String
+  created_at      DateTime  @default(now())
+}
+
+model Follower {
+  id              Int       @id @default(autoincrement())
+  user_id         Int
+  follower_id     Int
+  created_at      DateTime  @default(now())
+}
+
 model User {
   id        Int       @id @default(autoincrement())
   photo     String?
