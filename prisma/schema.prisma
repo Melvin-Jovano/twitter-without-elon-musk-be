@@ -10,9 +10,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Jwt {
+  id              Int       @id @default(autoincrement())
+  user_id         Int
+  refresh_token   String
+  created_at      DateTime  @default(now())
+}
+
 model User {
   id        Int       @id @default(autoincrement())
+  photo     String?
   username  String
+  name      String
   password  String
-  createdAt DateTime @default(now())
+  created_at DateTime @default(now())
 }
