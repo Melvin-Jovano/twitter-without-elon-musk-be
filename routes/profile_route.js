@@ -9,6 +9,6 @@ const uploadImage = fileUpload({
 
 const routerProfilePic = express.Router();
 
-routerProfilePic.post("/newprofilepicture", checkJWT, uploadImage,postProfilePicture)
+routerProfilePic.put("/user/profile-picture", checkJWT, uploadImage, postProfilePicture);
 
 export default routerProfilePic;
