@@ -19,7 +19,7 @@ export const updateUserPhoto = (req,res)=>{
     const fileUrl = `/images/${fileName}`;
     
     if(!allowedExt.includes(extension.toLowerCase())){
-        return res.status(422).send({
+        return res.status(403).send({
             message : "Invalid Image"
         });
     }
@@ -45,12 +45,12 @@ export const updateUserPhoto = (req,res)=>{
                 }
             });
 
-            res.status(201).send({
-                message : "Profile Picture Changed",
+            return res.status(200).send({
+                message : "SUCCESS",
                 data : updatedPicture
             });
         } catch(error){
-            res.status(400).send({
+            return res.status(500).send({
                 message : "An Error Has Occured",
                 data : null
             });

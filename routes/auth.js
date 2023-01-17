@@ -5,8 +5,8 @@ import { checkJWT } from "../middlewares/jwt.js";
 const authRouter = express.Router();
 
 authRouter.post('/auth/login', login);
-authRouter.post('/auth/register', register);
-authRouter.post('/auth/logout', checkJWT, logout);
-authRouter.post('/auth/refresh', refreshToken);
+authRouter.put('/auth/register', register);
+authRouter.delete('/auth/logout', checkJWT, logout);
+authRouter.put('/auth/refresh', refreshToken);
 
 export default authRouter;

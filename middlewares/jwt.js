@@ -12,17 +12,16 @@ export const checkJWT = async (req, res, next) => {
 
         verify(token, config.ACCESS_TOKEN_SECRET, function(err, decoded) {
             if (err !== null && err.name === 'TokenExpiredError') {
-                res.send({
+                return res.status(401).send({
                     message: 'EXPIRED_TOKEN',
                     data: null
                 });
-                return;
             }
             res.locals.payload = decoded;
             next();
         });
     } catch (error) {
-        res.send({
+        return res.status(401).send({
             message: 'INVALID_TOKEN',
             data: null
         });
