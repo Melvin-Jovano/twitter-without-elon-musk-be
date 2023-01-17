@@ -25,7 +25,7 @@ export const login = async ( req, res ) => {
                 const accessToken = sign({
                     userId: getUserByUsernameAndPassword.id
                 }, config.ACCESS_TOKEN_SECRET, {
-                    expiresIn: '10m'
+                    // expiresIn: '10m'
                 });
 
                 const refresh_token = sign({
@@ -44,7 +44,11 @@ export const login = async ( req, res ) => {
                     message: 'SUCCESS',
                     data: {
                         accessToken,
-                        refresh_token
+                        refresh_token,
+                        username: getUserByUsernameAndPassword.username,
+                        name: getUserByUsernameAndPassword.name,
+                        photo: getUserByUsernameAndPassword.photo,
+                        joinedSince: getUserByUsernameAndPassword.created_at,
                     }
                 });
                 return;
