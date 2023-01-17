@@ -1,6 +1,6 @@
 import express from "express";
 import fileUpload from 'express-fileupload';
-import { postProfilePicture } from "../controllers/profile.js";
+import { updateUserPhoto } from "../controllers/user.js";
 import { checkJWT } from "../middlewares/jwt.js";
 
 const uploadImage = fileUpload({
@@ -9,6 +9,6 @@ const uploadImage = fileUpload({
 
 const routerProfilePic = express.Router();
 
-routerProfilePic.put("/user/profile-picture", checkJWT, uploadImage, postProfilePicture);
+routerProfilePic.put("/user", checkJWT, uploadImage, updateUserPhoto);
 
 export default routerProfilePic;

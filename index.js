@@ -2,7 +2,7 @@ import express from 'express';
 import authRouter from './routes/auth.js';
 import cors from 'cors';
 import config from './config/app.js';
-import routerProfilePic from './routes/profileRoute.js';
+import routerProfilePic from './routes/user.js';
 
 const app = express();
 
