@@ -11,11 +11,15 @@ export const checkJWT = async (req, res, next) => {
         const token = bearerHeader.split(' ')[1];
 
         verify(token, config.ACCESS_TOKEN_SECRET, function(err, decoded) {
-            if (err !== null && err.name === 'TokenExpiredError') {
-                return res.status(401).send({
-                    message: 'EXPIRED_TOKEN',
-                    data: null
-                });
+            if (err !== null) {
+                if(err.name === 'TokenExpiredError') {
+                    return res.status(401).send({
+                        message: 'EXPIRED_TOKEN',
+                    });
+                }
+                if(err.name === 'JsonWebTokenError') {
+                    throw Error();
+                }
             }
             res.locals.payload = decoded;
             next();
@@ -23,7 +27,6 @@ export const checkJWT = async (req, res, next) => {
     } catch (error) {
         return res.status(401).send({
             message: 'INVALID_TOKEN',
-            data: null
         });
     }
 }

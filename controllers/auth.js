@@ -55,13 +55,11 @@ export const login = async ( req, res ) => {
             }
             return res.status(404).send({
                 message: 'No User Found With Given Username / Password',
-                data: null
             });
         }
 
         return res.status(404).send({
             message: 'No User Found',
-            data: null
         });
     } catch (error) {
         return res.status(500).send({
@@ -83,7 +81,6 @@ export const logout = async ( req, res ) => {
         });
         return res.status(204).send({
             message: `SUCCESS`,
-            data: null
         });
     } catch (error) {
         return res.status(500).send({
@@ -140,7 +137,6 @@ export const refreshToken = async ( req, res ) => {
 
         return res.status(404).send({
             message: 'No Token Found',
-            data: null
         });
     } catch (error) {
         return res.status(500).send({
@@ -158,7 +154,6 @@ export const register = async ( req, res ) => {
         if(!checkUsername) {
             return res.status(403).send({
                 message: `Invalid Username (No Spaces And All Lowercase)`,
-                data: null
             });
         }
 
@@ -195,13 +190,11 @@ export const register = async ( req, res ) => {
 
             return res.status(201).send({
                 message: `SUCCESS`,
-                data: null
             });
         } 
 
         return res.status(409).send({
             message: 'Username Already Exist',
-            data: null
         });
     } catch (error) {
         return res.status(500).send({

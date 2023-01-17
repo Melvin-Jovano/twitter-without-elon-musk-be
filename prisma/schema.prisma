@@ -48,8 +48,11 @@ model Follower {
 model User {
   id        Int       @id @default(autoincrement())
   photo     String?
+  cover     String?
   username  String
   name      String
+  bio       String?
+  location  String?
   password  String
   created_at DateTime @default(now())
 }
