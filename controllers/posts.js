@@ -5,7 +5,12 @@ const prisma = new PrismaClient();
 // get all post
 export const getAllPosts = async (req, res) => {
     try{
-        const response = await prisma.post.findMany();
+        let { page, limit } = req.query
+        const skip = (page - 1) * limit
+        const response = await prisma.post.findMany({
+            take: parseInt(limit),
+            skip: skip
+        })
         return res.status(200).send({
             message : "get all post success",
             data: response
@@ -30,6 +35,7 @@ export const getPostsById = async (req, res) => {
             data: response
         });
     } catch(err){
+        console.log(err);
         return res.status(500).send({
             message : err,
         });
@@ -86,7 +92,10 @@ export const deletePosts = async (req, res) => {
                 id: Number(req.params.id)
             }
         })
-        return res.json(posts)
+        return res.status(200).send({
+            message : "Post deleted successfully",
+            data: posts
+        });
     } catch(err) {
         return res.status(400).send({
             message : "error",
