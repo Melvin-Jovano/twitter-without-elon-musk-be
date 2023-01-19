@@ -4,6 +4,94 @@ import { v4 as uuidv4 } from 'uuid';
 
 const prisma = new PrismaClient();
 
+export const getUser = async (req, res)=>{
+    try {
+        const dataPerPage = (req.query.limit !== undefined) 
+            ? Number(req.query.limit)
+            : 15;
+
+        if(req.query.name === undefined && req.query.username === undefined) {
+            const {userId} = res.locals.payload;
+
+            const getUserById = await prisma.user.findUnique({
+                select: {
+                    username: true,
+                    name: true,
+                    cover: true,
+                    photo: true,
+                    location: true,
+                    bio: true,
+                    created_at: true
+                },
+                where: {
+                    id: userId
+                }
+            });
+
+            return res.status(200).send({
+                message : "SUCCESS",
+                data: getUserById
+            });
+        }
+
+        const username = (req.query.username) 
+            ?  {
+                username: {
+                    contains : req.query.username,
+                }
+            }
+            : {};
+
+        const name = (req.query.name) 
+            ?  {
+                name: {
+                    contains : req.query.name,
+                }
+            }
+            : {};
+
+        const getUser = await prisma.user.findMany({
+            orderBy: [
+                {id: 'asc'}
+            ],
+            select: {
+                username: true,
+                name: true,
+                id: true,
+                photo: true
+            },
+            where: {
+                ...name,
+                ...username,
+                id: {
+                    gte: Number(req.query.last_id || '0')
+                }
+            },
+            take: dataPerPage+1,
+        });
+
+        let lastId = null;
+
+        if(getUser.length > dataPerPage) {
+            lastId = getUser.pop().id;
+        }
+
+        return res.status(200).send({
+            message : "SUCCESS",
+            data: {
+                data: getUser,
+                lastId
+            }
+        });
+    } catch(error) {
+        console.error(error);
+        return res.status(500).send({
+            message : "An Error Has Occured",
+        });
+    }
+}
+
+
 export const updateUser = async (req, res)=>{
     try {
         const {bio, name, location} = req.body;

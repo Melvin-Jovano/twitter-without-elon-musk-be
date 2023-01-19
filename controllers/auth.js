@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import bycrypt from 'bcryptjs';
 import pkg from 'jsonwebtoken';
 import config from '../config/app.js';
-import { uniqueNamesGenerator, adjectives, colors, animals } from 'unique-names-generator';
+import { uniqueNamesGenerator, colors, animals } from 'unique-names-generator';
 import { validateUsername } from '../utils/app.js';
 
 const { sign, verify } = pkg;
@@ -26,6 +26,7 @@ export const login = async ( req, res ) => {
                 const accessToken = sign({
                     userId: getUserByUsernameAndPassword.id
                 }, config.ACCESS_TOKEN_SECRET, {
+                    // TODO Uncomment When Production
                     // expiresIn: '10m'
                 });
 
@@ -175,9 +176,8 @@ export const register = async ( req, res ) => {
             const hashedPassword = bycrypt.hashSync(password, 10);
 
             const shortName = uniqueNamesGenerator({
-                dictionaries: [adjectives, colors, animals],
+                dictionaries: [colors, animals],
                 separator: ' ',
-                seed: 120498,
             });
 
             await prisma.user.create({
