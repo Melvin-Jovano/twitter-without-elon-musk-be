@@ -1,6 +1,4 @@
 import {PrismaClient} from "@prisma/client";
-import path from "path";
-import { v4 as uuidv4 } from 'uuid';
 
 const prisma = new PrismaClient();
 
@@ -40,17 +38,56 @@ export const getPostsById = async (req, res) => {
 
 // create posts
 export const createPosts = async (req, res) => {
+    const content = req.body
+    const userId = res.locals.payload;
     try{
         const posts = await prisma.post.create({
             data: { 
-                content: req.body.content,
-                user_id: res.locals.payload.userId
+                content: content.content,
+                user_id: userId.userId
             }
         })
-        console.log(posts);
-        return res.json(posts)
+        return res.status(200).send({
+            message : "Create new post success",
+            data: posts
+        });
     } catch(err){
         console.log(err);
+        return res.status(400).send({
+            message : "error",
+        });
+    }
+}
+
+// edit post
+export const updatePosts = async (req, res) => {
+    try {
+        const posts = await prisma.post.update({
+            where: {
+                id: Number(req.params.id)
+            },
+            data: { 
+                content: req.body.content
+            }
+        })
+        return res.json(posts)
+    } catch(err) {
+        return res.status(400).send({
+            message : "error",
+        });
+    }
+}
+
+// delete posts
+export const deletePosts = async (req, res) => {
+    try {
+        const posts = await prisma.post.delete  ({
+            where: {
+                id: Number(req.params.id)
+            }
+        })
+        return res.json(posts)
+    } catch(err) {
         return res.status(400).send({
             message : "error",
         });
