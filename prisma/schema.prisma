@@ -72,6 +72,7 @@ model GroupChat {
 model ChatList {
   id          Int      @id @default(autoincrement())
   group_id    Int
+  user_id     Int
   created_at  DateTime @default(now())
 }
 
