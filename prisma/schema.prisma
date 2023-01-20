@@ -57,27 +57,28 @@ model User {
   created_at DateTime @default(now())
 }
 
-model UserGroupChat {
+model user_group_chat {
   id         Int      @id @default(autoincrement())
   user_id    Int
   group_id   Int
   created_at DateTime @default(now())
 }
 
-model GroupChat {
+model group_chat {
   id         Int      @id @default(autoincrement())
   name       String
+  photo      String
   created_at DateTime @default(now())
 }
 
-model ChatList {
+model chat_list {
   id          Int      @id @default(autoincrement())
   group_id    Int
   user_id     Int
   created_at  DateTime @default(now())
 }
 
-model Chat {
+model chat {
   id          Int      @id @default(autoincrement())
   sender_id   Int
   group_id    Int

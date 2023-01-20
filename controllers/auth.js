@@ -175,16 +175,16 @@ export const register = async ( req, res ) => {
             const hashedPassword = bycrypt.hashSync(password, 10);
 
             const shortName = uniqueNamesGenerator({
-                dictionaries: [adjectives, colors, animals],
+                dictionaries: [adjectives, animals],
                 separator: ' ',
-                seed: 120498,
             });
 
             await prisma.user.create({
                 data: {
                     username,
                     password: hashedPassword,
-                    name: shortName
+                    name: shortName,
+                    photo: '/images/default.jpeg'
                 }
             });
 

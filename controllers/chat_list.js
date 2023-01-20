@@ -2,6 +2,51 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+export const getChatLists = async (req, res) => {
+    try {
+        const {userId} = res.locals.payload;
+        const dataPerPage = (req.query.limit !== undefined) 
+            ? Number(req.query.limit)
+            : 10;
+
+        const getChatListByUserId = await prisma.chat_list.findMany({
+            orderBy: [
+                {id: 'asc'}
+            ],
+            take: dataPerPage+1,
+            where: {
+                user_id: userId,
+                id: {
+                    gte: Number(req.query.last_id || '0')
+                }
+            },
+            select: {
+                group_id: true,
+                id: true
+            }
+        });
+
+        let lastId = null;
+
+        if(getChatListByUserId.length > dataPerPage) {
+            lastId = getChatListByUserId.pop().id;
+        }
+
+        return res.status(200).send({
+            message: 'SUCCESS',
+            data: {
+                data: getChatListByUserId,
+                lastId
+            }
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).send({
+            message : 'An Error Has Occured'
+        });
+    }
+}
+
 export const addChatList = async (req, res) => {
     try {
         const {userIds, name} = req.body;
@@ -9,15 +54,10 @@ export const addChatList = async (req, res) => {
 
         userIds.push(userId);
 
-        // Transaction
-        const [posts, totalPosts] = await prisma.$transaction([
-            prisma.post.findMany({ where: { title: { contains: 'prisma' } } }),
-            prisma.post.count(),
-        ]);
-
-        const createGroup = await prisma.groupChat.create({
+        const createGroup = await prisma.group_chat.create({
             data: {
-                name
+                name,
+                photo: '/images/group_default.png'
             }
         });
 
@@ -28,23 +68,21 @@ export const addChatList = async (req, res) => {
             }
         });
 
-        await prisma.userGroupChat.createMany({
-            data
-        });
-
-        const createChatList = await prisma.chatList.create({
-            data: {
-                group_id: createGroup.id,
-                user_id: userIds
-            }
-        });
+        // Transaction
+        await prisma.$transaction([
+            prisma.user_group_chat.createMany({
+                data
+            }),
+            prisma.chat_list.createMany({
+                data
+            }),
+        ]);
 
         return res.status(200).send({
             message: 'SUCCESS',
             data: name
         });
     } catch (error) {
-        console.error(error);
         return res.status(500).send({
             message : 'An Error Has Occured'
         });
