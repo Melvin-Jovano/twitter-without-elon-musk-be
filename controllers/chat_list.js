@@ -9,6 +9,7 @@ export const getChatLists = async (req, res) => {
             ? Number(req.query.limit)
             : 10;
 
+        // TODO Implemen Join Table
         const getChatListByUserId = await prisma.chat_list.findMany({
             orderBy: [
                 {id: 'asc'}
@@ -69,7 +70,7 @@ export const addChatList = async (req, res) => {
         });
 
         // Transaction
-        await prisma.$transaction([
+        const [_, chatList] = await prisma.$transaction([
             prisma.user_group_chat.createMany({
                 data
             }),
@@ -80,7 +81,11 @@ export const addChatList = async (req, res) => {
 
         return res.status(200).send({
             message: 'SUCCESS',
-            data: name
+            data: {
+                id: createGroup.id,
+                photo: createGroup.photo,
+                name
+            }
         });
     } catch (error) {
         return res.status(500).send({
