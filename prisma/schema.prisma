@@ -60,6 +60,7 @@ model User {
 model UserGroupChat {
   id         Int      @id @default(autoincrement())
   user_id    Int
+  group_id   Int
   created_at DateTime @default(now())
 }
 
