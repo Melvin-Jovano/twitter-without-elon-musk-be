@@ -46,36 +46,40 @@ model Follower {
 }
 
 model User {
-  id         Int      @id @default(autoincrement())
-  photo      String?
-  cover      String?
-  username   String
-  name       String
-  bio        String?
-  location   String?
-  password   String
-  created_at DateTime @default(now())
+  id          Int                 @id @default(autoincrement())
+  photo       String?
+  cover       String?
+  username    String
+  name        String
+  bio         String?
+  location    String?
+  password    String
+  group_chats user_group_chat[]
+  created_at  DateTime            @default(now())
 }
 
 model user_group_chat {
-  id         Int      @id @default(autoincrement())
+  id         Int        @id @default(autoincrement())  
+  user       User       @relation(fields: [user_id], references: [id])
   user_id    Int
+  group      group_chat @relation(fields: [group_id], references: [id])
   group_id   Int
-  created_at DateTime @default(now())
+  created_at DateTime   @default(now())
 }
 
 model group_chat {
-  id         Int      @id @default(autoincrement())
-  name       String
-  photo      String
-  created_at DateTime @default(now())
+  id          Int                 @id @default(autoincrement())
+  name        String
+  user_group  user_group_chat[]  
+  photo       String
+  created_at  DateTime            @default(now())
 }
 
 model chat_list {
-  id          Int      @id @default(autoincrement())
-  group_id    Int
+  id          Int           @id @default(autoincrement())
+  group_id    Int           
   user_id     Int
-  created_at  DateTime @default(now())
+  created_at  DateTime      @default(now())
 }
 
 model chat {
