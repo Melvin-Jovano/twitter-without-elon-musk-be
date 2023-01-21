@@ -8,7 +8,6 @@ export const addChat = async (req, res) => {
         const {content, groupId, senderId} = req.body;
 
         // TODO Check If Group Exist
-
         await prisma.chat.create({
             data: {
                 content,

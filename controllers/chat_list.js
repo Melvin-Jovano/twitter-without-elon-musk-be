@@ -64,7 +64,7 @@ export const getChatLists = async (req, res) => {
             }
 
             // Check How Many Users In The Group
-            if(getUserGroupsByGroupIds.length <= 2) {
+            if(getUserGroupsByGroupIds.length === 2) {
                 await Promise.all(getUserGroupsByGroupIds.map(async userGroup => {
                     if(userGroup.user_id !== userId) {
                         const getUserById = await prisma.user.findUnique({
@@ -74,9 +74,22 @@ export const getChatLists = async (req, res) => {
                         });
                         if(getUserById !== null) {
                             username = getUserById.username;
+                            group.name = getUserById.name;
+                            group.photo = getUserById.photo;
                         }
                     }
                 }));
+            } else if(getUserGroupsByGroupIds.length === 1) {
+                const getUserById = await prisma.user.findUnique({
+                    where: {
+                        id: userId
+                    }
+                });
+                if(getUserById !== null) {
+                    username = getUserById.username;
+                    group.name = getUserById.name;
+                    group.photo = getUserById.photo;
+                }
             }
 
             return {
@@ -101,7 +114,6 @@ export const getChatLists = async (req, res) => {
             }
         });
     } catch (error) {
-        console.error(error);
         return res.status(500).send({
             message : 'An Error Has Occured'
         });
@@ -113,7 +125,32 @@ export const addChatList = async (req, res) => {
         const {userIds, name} = req.body;
         const {userId} = res.locals.payload;
 
-        userIds.push(userId);
+        if(!userIds.includes(userId)) {
+            userIds.push(userId);
+        }
+
+        if(userIds.length === 2) {
+            const getGroupByUserIds = await prisma.user_group_chat.groupBy({
+                by: ['group_id', 'user_id'],
+                where: {
+                    user_id: {
+                        in: userIds
+                    }
+                }
+            });
+            const groupHashmap = {};
+            for (const group of getGroupByUserIds) {
+                if(groupHashmap[group.group_id] === undefined) {
+                    groupHashmap[group.group_id] = 0;
+                }
+                groupHashmap[group.group_id] += 1;
+                if(groupHashmap[group.group_id] === 2) {
+                    return res.status(500).send({
+                        message : 'You Already Have A Chat With This User'
+                    });
+                }
+            }
+        }
 
         const createGroup = await prisma.group_chat.create({
             data: {
