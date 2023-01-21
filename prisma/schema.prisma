@@ -92,6 +92,7 @@ model chat {
   id          Int           @id @default(autoincrement())
   sender_id   Int
   group_id    Int
+  is_read     Boolean       @default(false)
   content     String
   created_at  DateTime      @default(now())
   user        User          @relation(fields: [sender_id], references: [id])
