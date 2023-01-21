@@ -8,35 +8,95 @@ export const getChatLists = async (req, res) => {
         const dataPerPage = (req.query.limit !== undefined) 
             ? Number(req.query.limit)
             : 10;
+        const paging = (req.query.last_id !== undefined) 
+            ? {
+                id: {
+                    lte: Number(req.query.last_id)
+                }
+            } 
+            : {};
 
-        // TODO Implemen Join Table
         const getChatListByUserId = await prisma.chat_list.findMany({
             orderBy: [
-                {id: 'asc'}
+                {id: 'desc'}
             ],
             take: dataPerPage+1,
             where: {
                 user_id: userId,
-                id: {
-                    gte: Number(req.query.last_id || '0')
-                }
+                ...paging
             },
             select: {
-                group_id: true,
-                id: true
+                group: {
+                    select: {
+                        photo: true,
+                        name: true,
+                        id: true
+                    }
+                },
             }
         });
 
+        let groups = getChatListByUserId.map(chatList => {
+            return {
+                ...chatList.group
+            };
+        });
+
+        groups = await Promise.all(groups.map(async group => {
+            let [username, lastChat, time] = [null, null, null];
+            const getUserGroupsByGroupIds = await prisma.user_group_chat.findMany({
+                where: {
+                    group_id: group.id
+                }
+            });
+            const getLastChatByGroup = await prisma.chat.findFirst({
+                orderBy: [{created_at: 'desc'}],
+                where: {
+                    group_id: group.id
+                },
+                take: 1
+            });
+
+            // Get Last Chat By Group
+            if(getLastChatByGroup !== null) {
+                lastChat = getLastChatByGroup.content;
+                time = getLastChatByGroup.created_at;
+            }
+
+            // Check How Many Users In The Group
+            if(getUserGroupsByGroupIds.length <= 2) {
+                await Promise.all(getUserGroupsByGroupIds.map(async userGroup => {
+                    if(userGroup.user_id !== userId) {
+                        const getUserById = await prisma.user.findUnique({
+                            where: {
+                                id: userGroup.user_id
+                            }
+                        });
+                        if(getUserById !== null) {
+                            username = getUserById.username;
+                        }
+                    }
+                }));
+            }
+
+            return {
+                time,
+                username,
+                lastChat,
+                ...group
+            }
+        }));
+
         let lastId = null;
 
-        if(getChatListByUserId.length > dataPerPage) {
-            lastId = getChatListByUserId.pop().id;
+        if(groups.length > dataPerPage) {
+            lastId = groups.pop().id;
         }
 
         return res.status(200).send({
             message: 'SUCCESS',
             data: {
-                data: getChatListByUserId,
+                data: groups,
                 lastId
             }
         });
@@ -88,7 +148,6 @@ export const addChatList = async (req, res) => {
             }
         });
     } catch (error) {
-        console.error(error);
         return res.status(500).send({
             message : 'An Error Has Occured'
         });

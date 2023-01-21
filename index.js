@@ -5,6 +5,7 @@ import config from './config/app.js';
 import userRouter from './routes/user.js';
 import postsRouter from './routes/posts.js';
 import chatListRouter from './routes/chat_list.js';
+import chatRouter from './routes/chat.js';
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use(authRouter);
 app.use(userRouter);
 app.use(postsRouter);
 app.use(chatListRouter);
+app.use(chatRouter);
 
 app.listen(config.APP_PORT, () => {
     console.log(`Server Activated On Port ${config.APP_PORT}`);
