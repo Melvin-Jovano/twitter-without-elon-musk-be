@@ -1,5 +1,6 @@
 import {PrismaClient} from "@prisma/client";
 import path from "path";
+import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 
 const prisma = new PrismaClient();
@@ -228,4 +229,40 @@ export const updateUserPhoto = (req, res)=>{
             });
         }
     });
+}
+
+export const deleteUserCover = (req,res)=>{
+    const file = req.body.cover;
+    const filePath = `public${file}`;
+
+    fs.unlink(filePath, async(err)=>{
+        if(err){
+            return res.status(500).send({
+                message : 'An Error Has Occured' + err
+            });
+        }
+
+        try {
+            const getUserId = res.locals.payload.userId;
+            const deleteCover = await prisma.user.update({
+                where:{
+                    id : getUserId 
+                },
+                data:{
+                    cover : ""
+                },
+                select:{
+                    cover: true
+                }
+            })
+
+            return res.status(200).send({
+                message : "SUCCESS"
+            });
+        } catch (error) {
+            return res.status(500).send({
+                message : "An Error Has Occured",
+            });
+        }
+    })
 }
