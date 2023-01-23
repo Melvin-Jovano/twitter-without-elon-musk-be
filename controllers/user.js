@@ -266,3 +266,16 @@ export const deleteUserCover = (req,res)=>{
         }
     })
 }
+
+export const deleteUserPhoto = (req, res)=>{
+    const file = req.body.oldImg;
+    const filePath = `public${file}`;
+
+    fs.unlink(filePath, (err)=>{
+        if(err){
+            return res.status(500).send({
+                message : 'An Error Has Occured' + err
+            });
+        }
+    })
+}
