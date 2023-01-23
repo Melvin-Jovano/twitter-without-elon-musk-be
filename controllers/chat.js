@@ -4,7 +4,6 @@ const prisma = new PrismaClient();
 
 export const addChat = async (req, res) => {
     try {
-        const {userId} = res.locals.payload;
         const {content, groupId, senderId} = req.body;
 
         // TODO Check If Group Exist
