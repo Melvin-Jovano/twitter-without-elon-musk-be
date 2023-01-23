@@ -22,6 +22,7 @@ model Post {
   user_id    Int
   content    String
   created_at DateTime @default(now())
+  user        User    @relation(fields: [user_id], references: [id])
 }
 
 model Like {
@@ -58,6 +59,7 @@ model User {
   chat_lists  chat_list[]
   group_chats user_group_chat[]
   chats       chat[]
+  posts       Post[]
 }
 
 model user_group_chat {
