@@ -23,4 +23,4 @@ app.listen(config.APP_PORT, () => {
     console.log(`Server Activated On Port ${config.APP_PORT}`);
 });
 
-const chatSocket = new Socket(app, 3001);
+export const chatSocket = new Socket(app, 3001);

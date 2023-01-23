@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { chatSocket } from '../index.js';
 
 const prisma = new PrismaClient();
 
@@ -43,7 +44,7 @@ export const getChatLists = async (req, res) => {
         });
 
         groups = await Promise.all(groups.map(async group => {
-            let [username, lastChat, time] = [null, null, null];
+            let [username, lastChat, time, isRead] = [null, null, null, false];
             const getUserGroupsByGroupIds = await prisma.user_group_chat.findMany({
                 where: {
                     group_id: group.id
@@ -60,6 +61,7 @@ export const getChatLists = async (req, res) => {
             // Get Last Chat By Group
             if(getLastChatByGroup !== null) {
                 lastChat = getLastChatByGroup.content;
+                isRead = getLastChatByGroup.is_read;
                 time = getLastChatByGroup.created_at;
             }
 
@@ -175,6 +177,13 @@ export const addChatList = async (req, res) => {
                 data
             }),
         ]);
+
+        chatSocket.socket.emit('new-chat-list', {
+            userIds,
+            id: createGroup.id,
+            photo: createGroup.photo,
+            name
+        });
 
         return res.status(200).send({
             message: 'SUCCESS',
