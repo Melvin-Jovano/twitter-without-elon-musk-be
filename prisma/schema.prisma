@@ -20,9 +20,9 @@ model Jwt {
 model Post {
   id         Int      @id @default(autoincrement())
   user_id    Int
-  content    String
+  content    String   @db.Text
   created_at DateTime @default(now())
-  user        User    @relation(fields: [user_id], references: [id])
+  user       User     @relation(fields: [user_id], references: [id])
 }
 
 model Like {
