@@ -184,7 +184,8 @@ export const register = async ( req, res ) => {
                 data: {
                     username,
                     password: hashedPassword,
-                    name: shortName
+                    name: shortName,
+                    photo: '/images/default.jpeg'
                 }
             });
 
