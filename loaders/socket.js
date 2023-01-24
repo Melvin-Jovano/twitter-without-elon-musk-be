@@ -41,7 +41,7 @@ export default class SocketLoader {
                         });
                         this.socket.emit('new-chat', createChat);
                     } catch (error) {
-                        console.error(error);
+                        return;
                     }
                 });
 
