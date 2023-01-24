@@ -138,13 +138,8 @@ export const getPostsById = async (req, res) => {
 
 // create posts
 export const createPosts = async (req, res) => {
-    const {content} = req.body
+    const {content, img} = req.body
     const {userId} = res.locals.payload;
-    let img = null;
-
-    if(req.body.img !== undefined) {
-        img = req.body.img;
-    }
 
     try{
         const posts = await prisma.post.create({
@@ -158,7 +153,7 @@ export const createPosts = async (req, res) => {
             message : "Create new post success",
             data: posts
         });
-    } catch(err){
+    } catch(err) {
         return res.status(400).send({
             message : "error",
         });
