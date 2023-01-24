@@ -60,6 +60,7 @@ export const getAllPosts = async (req, res) => {
             skip: skip,
             select: {
                 content: true,
+                img: true,
                 created_at: true,
                 user: {
                     select: {
@@ -95,6 +96,7 @@ export const getAllPostsById = async (req, res) => {
             },
             select: {
                 content: true,
+                img: true,
                 created_at: true,
                 user: {
                     select: {
@@ -139,14 +141,13 @@ export const getPostsById = async (req, res) => {
 // create posts
 export const createPosts = async (req, res) => {
     const {content, img} = req.body
-    const {userId} = res.locals.payload;
-
+    const userId = res.locals.payload;
     try{
         const posts = await prisma.post.create({
             data: { 
+                content,
                 img,
-                content: content,
-                user_id: userId
+                user_id: userId.userId
             }
         })
         return res.status(200).send({
@@ -168,7 +169,8 @@ export const updatePosts = async (req, res) => {
                 id: Number(req.params.id)
             },
             data: { 
-                content: req.body.content
+                content: req.body.content,
+                img: req.body.img
             }
         })
         return res.json(posts)
