@@ -44,7 +44,9 @@ model Follower {
   id          Int      @id @default(autoincrement())
   user_id     Int
   follower_id Int
-  created_at  DateTime @default(now())
+  created_at  DateTime    @default(now())
+  user        User        @relation("userId", fields: [user_id], references: [id])
+  follower    User        @relation("followerId", fields: [follower_id], references: [id])
 }
 
 model User {
@@ -61,6 +63,8 @@ model User {
   group_chats user_group_chat[]
   chats       chat[]
   posts       Post[]
+  followers   Follower[]            @relation("userId")
+  followed    Follower[]            @relation("followerId")
 }
 
 model user_group_chat {
