@@ -96,6 +96,7 @@ export const getAllPostsById = async (req, res) => {
             },
             select: {
                 content: true,
+                img: true,
                 created_at: true,
                 user: {
                     select: {
