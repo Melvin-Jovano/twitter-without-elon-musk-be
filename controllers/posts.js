@@ -138,13 +138,20 @@ export const getPostsById = async (req, res) => {
 
 // create posts
 export const createPosts = async (req, res) => {
-    const content = req.body
-    const userId = res.locals.payload;
+    const {content} = req.body
+    const {userId} = res.locals.payload;
+    let img = null;
+
+    if(req.body.img !== undefined) {
+        img = req.body.img;
+    }
+
     try{
         const posts = await prisma.post.create({
             data: { 
-                content: content.content,
-                user_id: userId.userId
+                img,
+                content: content,
+                user_id: userId
             }
         })
         return res.status(200).send({
