@@ -9,7 +9,19 @@ export const getAllPosts = async (req, res) => {
         const skip = (page - 1) * limit
         const response = await prisma.post.findMany({
             take: parseInt(limit),
-            skip: skip
+            skip: skip,
+            select: {
+                content: true,
+                created_at: true,
+                user: {
+                    select: {
+                        id: true,
+                        username: true,
+                        photo: true,
+                        name: true
+                    }
+                }
+            }
         })
         return res.status(200).send({
             message : "get all post success",
