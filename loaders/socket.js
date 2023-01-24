@@ -41,7 +41,25 @@ export default class SocketLoader {
                         });
                         this.socket.emit('new-chat', createChat);
                     } catch (error) {
-                        console.error(error);
+                        return;
+                    }
+                });
+
+                socket.on('read-chat', async (chatIds) => {
+                    try {
+                        await prisma.chat.updateMany({
+                            data: {
+                                is_read: true
+                            },
+                            where: {
+                                id: {
+                                    in: chatIds
+                                }
+                            }
+                        });
+                        this.socket.emit('seen-chat', chatIds);
+                    } catch (error) {
+                        return;
                     }
                 });
             }
