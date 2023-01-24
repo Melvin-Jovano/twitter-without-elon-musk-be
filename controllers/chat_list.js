@@ -11,7 +11,7 @@ export const getChatLists = async (req, res) => {
             : 10;
         const paging = (req.query.last_id !== undefined) 
             ? {
-                id: {
+                group_id: {
                     lte: Number(req.query.last_id)
                 }
             } 
@@ -44,7 +44,7 @@ export const getChatLists = async (req, res) => {
         });
 
         groups = await Promise.all(groups.map(async group => {
-            let [username, lastChat, time, isRead] = [null, null, null, false];
+            let [username, lastChat, time, isRead, senderId] = [null, null, null, false, null];
             const getUserGroupsByGroupIds = await prisma.user_group_chat.findMany({
                 where: {
                     group_id: group.id
@@ -60,6 +60,7 @@ export const getChatLists = async (req, res) => {
 
             // Get Last Chat By Group
             if(getLastChatByGroup !== null) {
+                senderId = getLastChatByGroup.sender_id;
                 lastChat = getLastChatByGroup.content;
                 isRead = getLastChatByGroup.is_read;
                 time = getLastChatByGroup.created_at;
@@ -95,6 +96,8 @@ export const getChatLists = async (req, res) => {
             }
 
             return {
+                senderId,
+                isRead,
                 time,
                 username,
                 lastChat,
