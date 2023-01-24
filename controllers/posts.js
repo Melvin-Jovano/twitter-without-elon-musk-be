@@ -34,6 +34,41 @@ export const getAllPosts = async (req, res) => {
     }
 }
 
+//get all posts by id
+export const getAllPostsById = async (req, res) => {
+    try{
+        let { page, limit } = req.query
+        const skip = (page - 1) * limit
+        const response = await prisma.post.findMany({
+            take: parseInt(limit),
+            skip: skip,
+            where:{
+                user_id : res.locals.payload.userId
+            },
+            select: {
+                content: true,
+                created_at: true,
+                user: {
+                    select: {
+                        id: true,
+                        username: true,
+                        photo: true,
+                        name: true
+                    }
+                }
+            }
+        })
+        return res.status(200).send({
+            message : "SUCCESS",
+            data: response
+        });
+    } catch(err){
+        return res.status(500).send({
+            message : err,
+        });
+    }
+}
+
 // get post by id
 export const getPostsById = async (req, res) => {
     try{
