@@ -14,7 +14,8 @@ export const getAllFollower = async (req,res)=>{
                     select:{
                         username : true,
                         name: true,
-                        photo: true
+                        photo: true,
+                        bio: true
                     }
                 }
             }
@@ -22,6 +23,35 @@ export const getAllFollower = async (req,res)=>{
         return res.status(200).send({
             message : "SUCCESS",
             data: getUserFollower
+        });
+    } catch (error) {
+        return res.status(500).send({
+            message : error,
+        });
+    } 
+}
+
+export const getAllFollowing = async (req,res)=>{
+    try {
+        const userId = res.locals.payload.userId;
+        const getUserFollowing = await prisma.follower.findMany({
+            where:{
+                follower_id : userId
+            },
+            select:{
+                user:{
+                    select:{
+                        username : true,
+                        name: true,
+                        photo: true,
+                        bio: true
+                    }
+                }
+            }
+        })
+        return res.status(200).send({
+            message : "SUCCESS",
+            data: getUserFollowing
         });
     } catch (error) {
         return res.status(500).send({

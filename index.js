@@ -7,7 +7,7 @@ import postsRouter from './routes/posts.js';
 import chatListRouter from './routes/chat_list.js';
 import chatRouter from './routes/chat.js';
 import Socket from './loaders/socket.js';
-import followerRouter from './routes/follower.js';
+import followRouter from './routes/follow.js';
 
 const app = express();
 
@@ -19,7 +19,7 @@ app.use(userRouter);
 app.use(postsRouter);
 app.use(chatListRouter);
 app.use(chatRouter);
-app.use(followerRouter)
+app.use(followRouter)
 
 app.listen(config.APP_PORT, () => {
     console.log(`Server Activated On Port ${config.APP_PORT}`);
