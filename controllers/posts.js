@@ -59,7 +59,9 @@ export const getAllPosts = async (req, res) => {
             take: parseInt(limit),
             skip: skip,
             select: {
+                id: true,
                 content: true,
+                img: true,
                 created_at: true,
                 user: {
                     select: {
@@ -154,6 +156,7 @@ export const createPosts = async (req, res) => {
             data: posts
         });
     } catch(err) {
+        console.error(err);
         return res.status(400).send({
             message : "error",
         });
