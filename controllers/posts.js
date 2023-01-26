@@ -125,7 +125,20 @@ export const getPostsById = async (req, res) => {
     try{
         const response = await prisma.post.findUnique({
             where: {
-                id: Number(req.params.id)
+                id: Number(req.params.id),
+            },
+            select: {
+                content: true,
+                img: true,
+                created_at: true,
+                user: {
+                    select: {
+                        id: true,
+                        username: true,
+                        photo: true,
+                        name: true
+                    }
+                }
             }
         });
         return res.status(200).send({
