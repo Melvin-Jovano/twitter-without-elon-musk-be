@@ -59,6 +59,7 @@ export const getAllPosts = async (req, res) => {
             take: parseInt(limit),
             skip: skip,
             select: {
+                id: true,
                 content: true,
                 img: true,
                 created_at: true,
@@ -141,20 +142,22 @@ export const getPostsById = async (req, res) => {
 // create posts
 export const createPosts = async (req, res) => {
     const {content, img} = req.body
-    const userId = res.locals.payload;
+    const {userId} = res.locals.payload;
+
     try{
         const posts = await prisma.post.create({
             data: { 
-                content,
                 img,
-                user_id: userId.userId
+                content: content,
+                user_id: userId
             }
         })
         return res.status(200).send({
             message : "Create new post success",
             data: posts
         });
-    } catch(err){
+    } catch(err) {
+        console.error(err);
         return res.status(400).send({
             message : "error",
         });

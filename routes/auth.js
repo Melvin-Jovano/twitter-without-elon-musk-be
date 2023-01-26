@@ -6,7 +6,7 @@ const authRouter = express.Router();
 
 authRouter.post('/auth/login', login);
 authRouter.put('/auth/register', register);
-authRouter.delete('/auth/logout', checkJWT, logout);
+authRouter.delete('/auth/logout', logout);
 authRouter.put('/auth/refresh', refreshToken);
-
+ 
 export default authRouter;

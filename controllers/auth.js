@@ -140,6 +140,7 @@ export const refreshToken = async ( req, res ) => {
             message: 'No Token Found',
         });
     } catch (error) {
+        console.error(error);
         return res.status(500).send({
             message : 'An Error Has Occured'
         });
