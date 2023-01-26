@@ -10,6 +10,7 @@ export const getAllFollower = async (req,res)=>{
                 user_id : userId
             },
             select:{
+                follower_id : true,
                 follower:{
                     select:{
                         username : true,
@@ -39,6 +40,7 @@ export const getAllFollowing = async (req,res)=>{
                 follower_id : userId
             },
             select:{
+                user_id : true,
                 user:{
                     select:{
                         username : true,
@@ -60,10 +62,11 @@ export const getAllFollowing = async (req,res)=>{
     } 
 }
 
+
 export const createFollower = async(req, res)=>{
     try {
-        const userId = res.locals.payload.userId
-        const followerId = req.body.followerId
+        const followerId = res.locals.payload.userId
+        const userId = req.body.followerId
         const checkFollower = await prisma.follower.findMany({
             where:{
                 AND:{
@@ -90,6 +93,39 @@ export const createFollower = async(req, res)=>{
         return res.status(200).send({
             message : "SUCCESS",
         });
+    } catch (error) {
+        return res.status(500).send({
+            message : error,
+        });
+    }
+}
+
+export const deleteFollowing = async(req, res)=>{
+    try {
+        const userId = res.locals.payload.userId
+        const followerId = req.body.followerId
+        const delFollowing = await prisma.follower.deleteMany({
+            where:{
+                AND:{
+                    user_id:{
+                        equals: followerId
+                    },
+                    follower_id : {
+                        equals: userId
+                    }
+                }
+            }
+        })
+        if(delFollowing.count > 0){
+            return res.status(200).send({
+                message : "SUCCESS"
+            });
+        }
+        else{
+            return res.status(404).send({
+                message : "No Following Found"
+            })
+        }
     } catch (error) {
         return res.status(500).send({
             message : error,
