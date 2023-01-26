@@ -11,19 +11,22 @@ datasource db {
 }
 
 model Jwt {
-  id            Int      @id @default(autoincrement())
+  id            Int       @id @default(autoincrement())
   user_id       Int
   refresh_token String
-  created_at    DateTime @default(now())
+  created_at    DateTime  @default(now())
+  user          User      @relation(fields: [user_id], references: [id])
 }
 
 model Post {
-  id         Int      @id @default(autoincrement())
-  user_id    Int
-  content    String   @db.Text
-  img        String?
-  created_at DateTime @default(now())
-  user       User     @relation(fields: [user_id], references: [id])
+  id          Int      @id @default(autoincrement())
+  user_id     Int
+  content     String   @db.Text
+  img         String?
+  created_at  DateTime @default(now())
+  user        User     @relation(fields: [user_id], references: [id])
+  likes       Like[]
+  hastags     Hashtag[]
 }
 
 model Like {
@@ -31,13 +34,16 @@ model Like {
   user_id    Int
   post_id    Int
   created_at DateTime @default(now())
+  post      Post      @relation(fields: [post_id], references: [id])
+  user      User      @relation(fields: [user_id], references: [id])
 }
 
 model Hashtag {
-  id         Int      @id @default(autoincrement())
-  post_id    Int
-  hastag     String
-  created_at DateTime @default(now())
+  id          Int       @id @default(autoincrement())
+  post_id     Int
+  hastag      String
+  created_at  DateTime  @default(now())
+  post        Post      @relation(fields: [post_id], references: [id])
 }
 
 model Follower {
@@ -65,15 +71,17 @@ model User {
   posts       Post[]
   followers   Follower[]            @relation("userId")
   followed    Follower[]            @relation("followerId")
+  likes       Like[]
+  jwt         Jwt[]
 }
 
 model user_group_chat {
   id          Int        @id @default(autoincrement())  
-  user        User       @relation(fields: [user_id], references: [id])
   user_id     Int
-  group       group_chat @relation(fields: [group_id], references: [id])
   group_id    Int
   created_at  DateTime   @default(now())
+  user        User       @relation(fields: [user_id], references: [id])
+  group       group_chat @relation(fields: [group_id], references: [id])
 }
 
 model group_chat {
