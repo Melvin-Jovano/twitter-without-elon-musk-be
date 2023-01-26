@@ -46,7 +46,8 @@ export const login = async ( req, res ) => {
                     message: 'SUCCESS',
                     data: {
                         accessToken,
-                        refresh_token,
+                        refreshToken: refresh_token,
+                        userId: getUserByUsernameAndPassword.id,
                         username: getUserByUsernameAndPassword.username,
                         name: getUserByUsernameAndPassword.name,
                         photo: getUserByUsernameAndPassword.photo,
@@ -72,11 +73,9 @@ export const login = async ( req, res ) => {
 export const logout = async ( req, res ) => {
     try {
         const {refreshToken} = req.body;
-        const {userId} = res.locals.payload;
 
         await prisma.jwt.deleteMany({
             where: {
-                user_id: userId,
                 refresh_token: refreshToken
             }
         });
