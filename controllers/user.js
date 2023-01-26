@@ -91,6 +91,31 @@ export const getUser = async (req, res)=>{
     }
 }
 
+export const findUserByUsername = async (req, res)=>{
+    try {
+        const {username} = req.params;
+
+        const user = await prisma.user.findUnique({
+            where: {
+                username
+            },
+            select: {
+                photo: true,
+                id: true,
+                name: true
+            }
+        });
+
+        return res.status(200).send({
+            message : "SUCCESS",
+            data: user
+        });
+    } catch(error) {
+        return res.status(500).send({
+            message : "An Error Has Occured",
+        });
+    }
+}
 
 export const updateUser = async (req, res)=>{
     try {
