@@ -148,7 +148,13 @@ export const refreshToken = async ( req, res ) => {
 
 export const register = async ( req, res ) => {
     try {
-        const {username, password} = req.body;
+        const {username, password, birthday} = req.body;
+        
+        let userBirthday = null;
+
+        if(birthday !== undefined && typeof birthday === 'number') {
+            userBirthday = birthday
+        }
 
         const checkUsername = validateUsername(username);
 
@@ -183,6 +189,7 @@ export const register = async ( req, res ) => {
             await prisma.user.create({
                 data: {
                     username,
+                    birthday: userBirthday,
                     password: hashedPassword,
                     name: shortName,
                     photo: '/images/default.jpeg'
