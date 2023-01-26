@@ -99,6 +99,7 @@ export const getAllPostsById = async (req, res) => {
                 content: true,
                 img: true,
                 created_at: true,
+                
                 user: {
                     select: {
                         id: true,
@@ -210,6 +211,29 @@ export const deletePosts = async (req, res) => {
             data: posts
         });
     } catch(err) {
+        return res.status(400).send({
+            message : "error",
+        });
+    }
+}
+
+// like
+export const like = async (req, res) => {
+    const {postId} = req.body
+    const {userId} = res.locals.payload;
+    try {
+        const like = await prisma.like.findMany({
+            where: {
+                user_id: userId,
+                post_id: postId
+            }
+        })
+        return res.status(200).send({
+            message : "SUCCESS",
+            data: like
+        });
+    } catch (error) {
+        console.log(error);
         return res.status(400).send({
             message : "error",
         });
