@@ -1,5 +1,5 @@
 import express from "express";
-import { createPosts, uploadImg, getAllPosts, getPostsById, updatePosts, deletePosts, getAllPostsById } from "../controllers/posts.js";
+import { createPosts, uploadImg, getAllPosts, getPostsById, updatePosts, deletePosts, getAllPostsById, like } from "../controllers/posts.js";
 import { checkJWT } from "../middlewares/jwt.js";
 import fileUpload from 'express-fileupload';
 
@@ -15,6 +15,7 @@ postsRouter.get('/posts/:id', getPostsById);
 postsRouter.get('/user/posts', checkJWT, getAllPostsById)
 postsRouter.post('/posts/', checkJWT, createPosts)
 postsRouter.put('/posts/:id', checkJWT, updatePosts)
+postsRouter.put('/like/', checkJWT, like)
 postsRouter.delete('/posts/:id', checkJWT, deletePosts)
 
 export default postsRouter;
