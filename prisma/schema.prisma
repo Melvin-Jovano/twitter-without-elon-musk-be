@@ -15,7 +15,7 @@ model Jwt {
   user_id       Int
   refresh_token String
   created_at    DateTime @default(now())
-  user          User     @relation(fields: [user_id], references: [id])
+  user          User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model Post {
@@ -24,7 +24,7 @@ model Post {
   content    String    @db.Text
   img        String?
   created_at DateTime  @default(now())
-  user       User      @relation(fields: [user_id], references: [id])
+  user       User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
   likes      Like[]
   hastags    Hashtag[]
 }
@@ -34,8 +34,8 @@ model Like {
   user_id    Int
   post_id    Int
   created_at DateTime @default(now())
-  post       Post     @relation(fields: [post_id], references: [id])
-  user       User     @relation(fields: [user_id], references: [id])
+  post       Post     @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model Hashtag {
@@ -43,7 +43,7 @@ model Hashtag {
   post_id    Int
   hashtag    String
   created_at DateTime @default(now())
-  post       Post     @relation(fields: [post_id], references: [id])
+  post       Post     @relation(fields: [post_id], references: [id], onDelete: Cascade)
 }
 
 model Follower {
@@ -51,8 +51,8 @@ model Follower {
   user_id     Int
   follower_id Int
   created_at  DateTime @default(now())
-  user        User     @relation("userId", fields: [user_id], references: [id])
-  follower    User     @relation("followerId", fields: [follower_id], references: [id])
+  user        User     @relation("userId", fields: [user_id], references: [id], onDelete: Cascade)
+  follower    User     @relation("followerId", fields: [follower_id], references: [id], onDelete: Cascade)
 }
 
 model User {
@@ -81,8 +81,8 @@ model user_group_chat {
   user_id    Int
   group_id   Int
   created_at DateTime   @default(now())
-  user       User       @relation(fields: [user_id], references: [id])
-  group      group_chat @relation(fields: [group_id], references: [id])
+  user       User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  group      group_chat @relation(fields: [group_id], references: [id], onDelete: Cascade)
 }
 
 model group_chat {
@@ -100,8 +100,8 @@ model chat_list {
   group_id   Int
   user_id    Int
   created_at DateTime   @default(now())
-  group      group_chat @relation(fields: [group_id], references: [id])
-  user       User       @relation(fields: [user_id], references: [id])
+  group      group_chat @relation(fields: [group_id], references: [id],onDelete: Cascade)
+  user       User       @relation(fields: [user_id], references: [id],onDelete: Cascade)
 }
 
 model chat {
@@ -111,6 +111,6 @@ model chat {
   is_read    Boolean    @default(false)
   content    String
   created_at DateTime   @default(now())
-  user       User       @relation(fields: [sender_id], references: [id])
-  groups     group_chat @relation(fields: [group_id], references: [id])
+  user       User       @relation(fields: [sender_id], references: [id],onDelete: Cascade)
+  groups     group_chat @relation(fields: [group_id], references: [id],onDelete: Cascade)
 }

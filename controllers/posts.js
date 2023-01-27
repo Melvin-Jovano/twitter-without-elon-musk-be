@@ -265,10 +265,9 @@ export const updatePosts = async (req, res) => {
     }
 }
 
-// delete posts
 export const deletePosts = async (req, res) => {
     try {
-        const posts = await prisma.post.delete  ({
+        const posts = await prisma.post.delete({
             where: {
                 id: Number(req.params.id)
             }
@@ -278,6 +277,7 @@ export const deletePosts = async (req, res) => {
             data: posts
         });
     } catch(err) {
+        console.error(err);
         return res.status(400).send({
             message : "error",
         });
