@@ -28,7 +28,13 @@ export const getChatByGroupId = async (req, res) => {
                 sender_id: true,
                 content: true,
                 created_at: true,
-                is_read: true
+                is_read: true,
+                user: {
+                    select: {
+                        photo: true,
+                        name: true
+                    }
+                }
             }
         });
 

@@ -25,7 +25,7 @@ export default class SocketLoader {
             } else {
                 socket.emit('auth', true);
 
-                socket.join(socket.param.room);
+                socket.join('chatting');
                 
                 socket.on("add-chat", async (body) => {
                     try {
@@ -37,10 +37,25 @@ export default class SocketLoader {
                                 content,
                                 group_id: groupId,
                                 sender_id: senderId
+                            },
+                            select: {
+                                id: true,
+                                sender_id: true,
+                                group_id: true,
+                                content: true,
+                                created_at: true,
+                                is_read: true,
+                                user: {
+                                    select: {
+                                        photo: true,
+                                        name: true
+                                    }
+                                }
                             }
                         });
                         this.socket.emit('new-chat', createChat);
                     } catch (error) {
+                        console.error(error);
                         return;
                     }
                 });
@@ -59,6 +74,7 @@ export default class SocketLoader {
                         });
                         this.socket.emit('seen-chat', chatIds);
                     } catch (error) {
+                        console.error(error);
                         return;
                     }
                 });
