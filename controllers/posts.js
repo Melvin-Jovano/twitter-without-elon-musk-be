@@ -62,7 +62,7 @@ export const getAllPosts = async (req, res) => {
                 }
             };
         }
-        
+
         const data = await prisma.post.findMany({
             orderBy: [{id: 'desc'}],
             take: Number(limit) + 1,
@@ -118,7 +118,6 @@ export const getAllPostsById = async (req, res) => {
                 content: true,
                 img: true,
                 created_at: true,
-                
                 user: {
                     select: {
                         id: true,
@@ -177,14 +176,63 @@ export const createPosts = async (req, res) => {
     const {content, img} = req.body
     const {userId} = res.locals.payload;
 
-    try{
+    try {
+        let hashtags = [];
+        let isHashtag = false;
+        let hashtag = '';
+
+        [...content].forEach((word, idx) => {
+            if(word === '#') {
+                isHashtag = true;
+            }
+            if((word === ' ' || /\r|\n/.exec(word)) && isHashtag) {
+                hashtags.push(hashtag);
+                hashtag = '';
+                isHashtag = false;
+            }
+            
+            if(isHashtag && word !== '#') {
+                hashtag += word;
+                if(idx+1 === content.length) {
+                    hashtags.push(hashtag);
+                }
+            }
+        });
+
         const posts = await prisma.post.create({
             data: { 
                 img,
-                content: content,
+                content,
                 user_id: userId
+            },
+            // TODO Get Likes
+            select: {
+                id: true,
+                content: true,
+                img: true,
+                created_at: true,
+                user: {
+                    select: {
+                        id: true,
+                        username: true,
+                        photo: true,
+                        name: true
+                    }
+                }
             }
-        })
+        });
+
+        if(hashtags.length > 0) {
+            await prisma.hashtag.createMany({
+                data: hashtags.map(h => {
+                    return {
+                        hashtag: h,
+                        post_id: posts.id
+                    }
+                })
+            });
+        }
+
         return res.status(200).send({
             message : "Create new post success",
             data: posts

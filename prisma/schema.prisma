@@ -41,7 +41,7 @@ model Like {
 model Hashtag {
   id         Int      @id @default(autoincrement())
   post_id    Int
-  hastag     String
+  hashtag    String
   created_at DateTime @default(now())
   post       Post     @relation(fields: [post_id], references: [id])
 }
