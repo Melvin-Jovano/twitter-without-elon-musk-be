@@ -88,10 +88,23 @@ export const createFollower = async(req, res)=>{
             data:{
                 user_id : userId,
                 follower_id : followerId
+            },
+            select: {
+                user_id : true,
+                user:{
+                    select:{
+                        username : true,
+                        name: true,
+                        photo: true,
+                        bio: true
+                    }
+                }
             }
-        })
+        });
+        
         return res.status(200).send({
             message : "SUCCESS",
+            data: follower
         });
     } catch (error) {
         return res.status(500).send({
