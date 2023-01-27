@@ -12,7 +12,7 @@ const postsRouter = express.Router();
 postsRouter.get('/posts', getAllPosts);
 postsRouter.post('/post/upload-img', uploadImage, uploadImg);
 postsRouter.get('/posts/:id', getPostsById);
-postsRouter.get('/user/posts', checkJWT, getAllPostsById)
+postsRouter.get('/userposts', checkJWT, getAllPostsById)
 postsRouter.post('/posts/', checkJWT, createPosts)
 postsRouter.put('/posts/:id', checkJWT, updatePosts)
 postsRouter.put('/like/', checkJWT, like)

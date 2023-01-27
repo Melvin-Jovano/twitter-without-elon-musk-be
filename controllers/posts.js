@@ -103,7 +103,7 @@ export const getAllPosts = async (req, res) => {
     }
 }
 
-//get all posts by id
+//get all posts by user id
 export const getAllPostsById = async (req, res) => {
     try{
         let { page, limit } = req.query
