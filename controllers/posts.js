@@ -50,7 +50,6 @@ export const uploadImg = async (req, res) => {
     }
 }
 
-// get all post
 export const getAllPosts = async (req, res) => {
     try{
         const { limit, last_id } = req.query;
@@ -70,6 +69,11 @@ export const getAllPosts = async (req, res) => {
                 ...idFilter
             },
             select: {
+                likes: {
+                    select: {
+                        user_id: true
+                    }
+                },
                 id: true,
                 content: true,
                 img: true,
@@ -103,18 +107,32 @@ export const getAllPosts = async (req, res) => {
     }
 }
 
-//get all posts by user id
 export const getAllPostsById = async (req, res) => {
     try{
-        let { page, limit } = req.query
-        const skip = (page - 1) * limit
-        const response = await prisma.post.findMany({
-            take: parseInt(limit),
-            skip: skip,
-            where:{
-                user_id : res.locals.payload.userId
+        const { limit, last_id } = req.query;
+        let [lastId, idFilter] = [null, {}];
+        if(last_id !== undefined) {
+            idFilter = {
+                id: {
+                    lte: Number(last_id)
+                }
+            };
+        }
+        const {userId} = res.locals.payload;
+
+        const data = await prisma.post.findMany({
+            orderBy: [{id: 'desc'}],
+            take: Number(limit) + 1,
+            where: {
+                user_id : userId,
+                ...idFilter
             },
             select: {
+                likes: {
+                    select: {
+                        user_id: true
+                    }
+                },
                 id:true,
                 content: true,
                 img: true,
@@ -128,10 +146,18 @@ export const getAllPostsById = async (req, res) => {
                     }
                 }
             }
-        })
+        });
+
+        if(data.length > limit) {
+            lastId = data.pop().id;
+        }
+
         return res.status(200).send({
             message : "SUCCESS",
-            data: response
+            data: {
+                data,
+                lastId
+            }
         });
     } catch(err){
         return res.status(500).send({
@@ -148,6 +174,7 @@ export const getPostsById = async (req, res) => {
                 id: Number(req.params.id),
             },
             select: {
+                id:true,
                 content: true,
                 img: true,
                 created_at: true,
@@ -206,8 +233,12 @@ export const createPosts = async (req, res) => {
                 content,
                 user_id: userId
             },
-            // TODO Get Likes
             select: {
+                likes: {
+                    select: {
+                        user_id: true
+                    }
+                },
                 id: true,
                 content: true,
                 img: true,
@@ -279,29 +310,6 @@ export const deletePosts = async (req, res) => {
         });
     } catch(err) {
         console.error(err);
-        return res.status(400).send({
-            message : "error",
-        });
-    }
-}
-
-// like
-export const like = async (req, res) => {
-    const {postId} = req.body
-    const {userId} = res.locals.payload;
-    try {
-        const like = await prisma.like.findMany({
-            where: {
-                user_id: userId,
-                post_id: postId
-            }
-        })
-        return res.status(200).send({
-            message : "SUCCESS",
-            data: like
-        });
-    } catch (error) {
-        console.log(error);
         return res.status(400).send({
             message : "error",
         });
