@@ -53,11 +53,22 @@ export const uploadImg = async (req, res) => {
 // get all post
 export const getAllPosts = async (req, res) => {
     try{
-        let { page, limit } = req.query
-        const skip = (page - 1) * limit
-        const response = await prisma.post.findMany({
-            take: parseInt(limit),
-            skip: skip,
+        const { limit, last_id } = req.query;
+        let [lastId, idFilter] = [null, {}];
+        if(last_id !== undefined) {
+            idFilter = {
+                id: {
+                    lte: Number(last_id)
+                }
+            };
+        }
+        
+        const data = await prisma.post.findMany({
+            orderBy: [{id: 'desc'}],
+            take: Number(limit) + 1,
+            where: {
+                ...idFilter
+            },
             select: {
                 id: true,
                 content: true,
@@ -73,10 +84,17 @@ export const getAllPosts = async (req, res) => {
                 }
             }
         });
+
+        if(data.length > limit) {
+            lastId = data.pop().id;
+        }
         
         return res.status(200).send({
-            message : "get all post success",
-            data: response
+            message : "SUCCESS",
+            data: {
+                data,
+                lastId
+            }
         });
     } catch(err){
         return res.status(500).send({
