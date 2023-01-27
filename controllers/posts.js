@@ -72,7 +72,8 @@ export const getAllPosts = async (req, res) => {
                     }
                 }
             }
-        })
+        });
+        
         return res.status(200).send({
             message : "get all post success",
             data: response

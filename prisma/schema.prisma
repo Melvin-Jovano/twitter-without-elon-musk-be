@@ -56,7 +56,8 @@ model Follower {
 }
 
 model User {
-  id          Int               @id @default(autoincrement())
+  id          Int                 @id @default(autoincrement())
+  birthday    Int?                  
   photo       String?
   cover       String?
   username    String            @unique
