@@ -115,6 +115,7 @@ export const getAllPostsById = async (req, res) => {
                 user_id : res.locals.payload.userId
             },
             select: {
+                id:true,
                 content: true,
                 img: true,
                 created_at: true,
