@@ -50,15 +50,31 @@ export const uploadImg = async (req, res) => {
     }
 }
 
-// get all post
 export const getAllPosts = async (req, res) => {
     try{
-        let { page, limit } = req.query
-        const skip = (page - 1) * limit
-        const response = await prisma.post.findMany({
-            take: parseInt(limit),
-            skip: skip,
+        const { limit, last_id } = req.query;
+        let [lastId, idFilter] = [null, {}];
+        if(last_id !== undefined) {
+            idFilter = {
+                id: {
+                    lte: Number(last_id)
+                }
+            };
+        }
+
+        const data = await prisma.post.findMany({
+            orderBy: [{id: 'desc'}],
+            take: Number(limit) + 1,
+            where: {
+                ...idFilter
+            },
             select: {
+                likes: {
+                    select: {
+                        user_id: true
+                    }
+                },
+                id: true,
                 content: true,
                 img: true,
                 created_at: true,
@@ -71,10 +87,18 @@ export const getAllPosts = async (req, res) => {
                     }
                 }
             }
-        })
+        });
+
+        if(data.length > limit) {
+            lastId = data.pop().id;
+        }
+        
         return res.status(200).send({
-            message : "get all post success",
-            data: response
+            message : "SUCCESS",
+            data: {
+                data,
+                lastId
+            }
         });
     } catch(err){
         return res.status(500).send({
@@ -83,18 +107,33 @@ export const getAllPosts = async (req, res) => {
     }
 }
 
-//get all posts by id
 export const getAllPostsById = async (req, res) => {
     try{
-        let { page, limit } = req.query
-        const skip = (page - 1) * limit
-        const response = await prisma.post.findMany({
-            take: parseInt(limit),
-            skip: skip,
-            where:{
-                user_id : res.locals.payload.userId
+        const { limit, last_id } = req.query;
+        let [lastId, idFilter] = [null, {}];
+        if(last_id !== undefined) {
+            idFilter = {
+                id: {
+                    lte: Number(last_id)
+                }
+            };
+        }
+        const {userId} = res.locals.payload;
+
+        const data = await prisma.post.findMany({
+            orderBy: [{id: 'desc'}],
+            take: Number(limit) + 1,
+            where: {
+                user_id : userId,
+                ...idFilter
             },
             select: {
+                likes: {
+                    select: {
+                        user_id: true
+                    }
+                },
+                id:true,
                 content: true,
                 img: true,
                 created_at: true,
@@ -107,10 +146,18 @@ export const getAllPostsById = async (req, res) => {
                     }
                 }
             }
-        })
+        });
+
+        if(data.length > limit) {
+            lastId = data.pop().id;
+        }
+
         return res.status(200).send({
             message : "SUCCESS",
-            data: response
+            data: {
+                data,
+                lastId
+            }
         });
     } catch(err){
         return res.status(500).send({
@@ -124,7 +171,21 @@ export const getPostsById = async (req, res) => {
     try{
         const response = await prisma.post.findUnique({
             where: {
-                id: Number(req.params.id)
+                id: Number(req.params.id),
+            },
+            select: {
+                id:true,
+                content: true,
+                img: true,
+                created_at: true,
+                user: {
+                    select: {
+                        id: true,
+                        username: true,
+                        photo: true,
+                        name: true
+                    }
+                }
             }
         });
         return res.status(200).send({
@@ -141,20 +202,76 @@ export const getPostsById = async (req, res) => {
 // create posts
 export const createPosts = async (req, res) => {
     const {content, img} = req.body
-    const userId = res.locals.payload;
-    try{
+    const {userId} = res.locals.payload;
+
+    try {
+        let hashtags = [];
+        let isHashtag = false;
+        let hashtag = '';
+
+        [...content].forEach((word, idx) => {
+            if(word === '#') {
+                isHashtag = true;
+            }
+            if((word === ' ' || /\r|\n/.exec(word)) && isHashtag) {
+                hashtags.push(hashtag);
+                hashtag = '';
+                isHashtag = false;
+            }
+            
+            if(isHashtag && word !== '#') {
+                hashtag += word;
+                if(idx+1 === content.length) {
+                    hashtags.push(hashtag);
+                }
+            }
+        });
+
         const posts = await prisma.post.create({
             data: { 
                 content,
                 img,
-                user_id: userId.userId
+                content,
+                user_id: userId
+            },
+            select: {
+                likes: {
+                    select: {
+                        user_id: true
+                    }
+                },
+                id: true,
+                content: true,
+                img: true,
+                created_at: true,
+                user: {
+                    select: {
+                        id: true,
+                        username: true,
+                        photo: true,
+                        name: true
+                    }
+                }
             }
-        })
+        });
+
+        if(hashtags.length > 0) {
+            await prisma.hashtag.createMany({
+                data: hashtags.map(h => {
+                    return {
+                        hashtag: h,
+                        post_id: posts.id
+                    }
+                })
+            });
+        }
+
         return res.status(200).send({
             message : "Create new post success",
             data: posts
         });
     } catch(err) {
+        console.error(err);
         return res.status(400).send({
             message : "error",
         });
@@ -181,10 +298,9 @@ export const updatePosts = async (req, res) => {
     }
 }
 
-// delete posts
 export const deletePosts = async (req, res) => {
     try {
-        const posts = await prisma.post.delete  ({
+        const posts = await prisma.post.delete({
             where: {
                 id: Number(req.params.id)
             }
@@ -194,6 +310,7 @@ export const deletePosts = async (req, res) => {
             data: posts
         });
     } catch(err) {
+        console.error(err);
         return res.status(400).send({
             message : "error",
         });

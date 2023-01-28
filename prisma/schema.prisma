@@ -15,15 +15,18 @@ model Jwt {
   user_id       Int
   refresh_token String
   created_at    DateTime @default(now())
+  user          User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model Post {
-  id         Int      @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   user_id    Int
-  content    String   @db.Text
+  content    String    @db.Text
   img        String?
-  created_at DateTime @default(now())
-  user       User     @relation(fields: [user_id], references: [id])
+  created_at DateTime  @default(now())
+  user       User      @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  likes      Like[]
+  hastags    Hashtag[]
 }
 
 model Like {
@@ -31,77 +34,83 @@ model Like {
   user_id    Int
   post_id    Int
   created_at DateTime @default(now())
+  post       Post     @relation(fields: [post_id], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model Hashtag {
   id         Int      @id @default(autoincrement())
   post_id    Int
-  hastag     String
+  hashtag    String
   created_at DateTime @default(now())
+  post       Post     @relation(fields: [post_id], references: [id], onDelete: Cascade)
 }
 
 model Follower {
   id          Int      @id @default(autoincrement())
   user_id     Int
   follower_id Int
-  created_at  DateTime    @default(now())
-  user        User        @relation("userId", fields: [user_id], references: [id])
-  follower    User        @relation("followerId", fields: [follower_id], references: [id])
+  created_at  DateTime @default(now())
+  user        User     @relation("userId", fields: [user_id], references: [id], onDelete: Cascade)
+  follower    User     @relation("followerId", fields: [follower_id], references: [id], onDelete: Cascade)
 }
 
 model User {
   id          Int                 @id @default(autoincrement())
+  birthday    Int?                  
   photo       String?
   cover       String?
-  username    String
+  username    String            @unique
   name        String
   bio         String?
   location    String?
   password    String
-  created_at  DateTime            @default(now())
+  created_at  DateTime          @default(now())
   chat_lists  chat_list[]
   group_chats user_group_chat[]
   chats       chat[]
   posts       Post[]
-  followers   Follower[]            @relation("userId")
-  followed    Follower[]            @relation("followerId")
+  followers   Follower[]        @relation("userId")
+  followed    Follower[]        @relation("followerId")
+  likes       Like[]
+  jwt         Jwt[]
 }
 
 model user_group_chat {
-  id          Int        @id @default(autoincrement())  
-  user        User       @relation(fields: [user_id], references: [id])
-  user_id     Int
-  group       group_chat @relation(fields: [group_id], references: [id])
-  group_id    Int
-  created_at  DateTime   @default(now())
+  id         Int        @id @default(autoincrement())
+  user_id    Int
+  group_id   Int
+  created_at DateTime   @default(now())
+  user       User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  group      group_chat @relation(fields: [group_id], references: [id], onDelete: Cascade)
 }
 
 model group_chat {
-  id            Int                 @id @default(autoincrement())
-  name          String
-  photo         String
-  created_at    DateTime            @default(now())
-  user_groups   user_group_chat[]
-  chat_lists    chat_list[]
-  chats         chat[]
+  id          Int               @id @default(autoincrement())
+  name        String
+  photo       String
+  created_at  DateTime          @default(now())
+  user_groups user_group_chat[]
+  chat_lists  chat_list[]
+  chats       chat[]
 }
 
 model chat_list {
-  id          Int           @id @default(autoincrement())
-  group_id    Int           
-  user_id     Int
-  created_at  DateTime      @default(now())
-  group       group_chat    @relation(fields: [group_id], references: [id])
-  user        User          @relation(fields: [user_id], references: [id])
+  id         Int        @id @default(autoincrement())
+  group_id   Int
+  user_id    Int
+  created_at DateTime   @default(now())
+  group      group_chat @relation(fields: [group_id], references: [id],onDelete: Cascade)
+  user       User       @relation(fields: [user_id], references: [id],onDelete: Cascade)
 }
 
 model chat {
-  id          Int           @id @default(autoincrement())
-  sender_id   Int
-  group_id    Int
-  is_read     Boolean       @default(false)
-  content     String
-  created_at  DateTime      @default(now())
-  user        User          @relation(fields: [sender_id], references: [id])
-  groups      group_chat    @relation(fields: [group_id], references: [id])
+  id         Int        @id @default(autoincrement())
+  sender_id  Int
+  group_id   Int
+  is_read    Boolean    @default(false)
+  content    String
+  created_at DateTime   @default(now())
+  user       User       @relation(fields: [sender_id], references: [id],onDelete: Cascade)
+  groups     group_chat @relation(fields: [group_id], references: [id],onDelete: Cascade)
 }

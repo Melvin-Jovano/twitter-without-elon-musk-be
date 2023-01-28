@@ -10,11 +10,11 @@ const uploadImage = fileUpload({
 const postsRouter = express.Router();
 
 postsRouter.get('/posts', getAllPosts);
-postsRouter.post('/post/upload-img', uploadImage, uploadImg);
-postsRouter.get('/posts/:id', getPostsById);
-postsRouter.get('/user/posts', checkJWT, getAllPostsById)
-postsRouter.post('/posts/', checkJWT, createPosts)
-postsRouter.put('/posts/:id', checkJWT, updatePosts)
-postsRouter.delete('/posts/:id', checkJWT, deletePosts)
+postsRouter.post('/post/upload-img', checkJWT, uploadImage, uploadImg);
+postsRouter.get('/posts/:id', checkJWT, getPostsById);
+postsRouter.get('/userposts', checkJWT, getAllPostsById);
+postsRouter.post('/posts/', checkJWT, createPosts);
+postsRouter.put('/posts/:id', checkJWT, updatePosts);
+postsRouter.delete('/posts/:id', checkJWT, deletePosts);
 
 export default postsRouter;

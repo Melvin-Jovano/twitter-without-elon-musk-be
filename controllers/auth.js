@@ -46,7 +46,8 @@ export const login = async ( req, res ) => {
                     message: 'SUCCESS',
                     data: {
                         accessToken,
-                        refresh_token,
+                        refreshToken: refresh_token,
+                        userId: getUserByUsernameAndPassword.id,
                         username: getUserByUsernameAndPassword.username,
                         name: getUserByUsernameAndPassword.name,
                         photo: getUserByUsernameAndPassword.photo,
@@ -72,11 +73,9 @@ export const login = async ( req, res ) => {
 export const logout = async ( req, res ) => {
     try {
         const {refreshToken} = req.body;
-        const {userId} = res.locals.payload;
 
         await prisma.jwt.deleteMany({
             where: {
-                user_id: userId,
                 refresh_token: refreshToken
             }
         });
@@ -140,6 +139,7 @@ export const refreshToken = async ( req, res ) => {
             message: 'No Token Found',
         });
     } catch (error) {
+        console.error(error);
         return res.status(500).send({
             message : 'An Error Has Occured'
         });
@@ -148,7 +148,13 @@ export const refreshToken = async ( req, res ) => {
 
 export const register = async ( req, res ) => {
     try {
-        const {username, password} = req.body;
+        const {username, password, birthday} = req.body;
+        
+        let userBirthday = null;
+
+        if(birthday !== undefined && typeof birthday === 'number') {
+            userBirthday = birthday
+        }
 
         const checkUsername = validateUsername(username);
 
@@ -183,6 +189,7 @@ export const register = async ( req, res ) => {
             await prisma.user.create({
                 data: {
                     username,
+                    birthday: userBirthday,
                     password: hashedPassword,
                     name: shortName,
                     photo: '/images/default.jpeg'
