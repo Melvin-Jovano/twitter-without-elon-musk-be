@@ -22,7 +22,8 @@ export const getUser = async (req, res)=>{
                     photo: true,
                     location: true,
                     bio: true,
-                    created_at: true
+                    created_at: true,
+                    birthday : true
                 },
                 where: {
                     id: userId
