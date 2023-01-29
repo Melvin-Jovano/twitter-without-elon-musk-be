@@ -229,6 +229,7 @@ export const createPosts = async (req, res) => {
 
         const posts = await prisma.post.create({
             data: { 
+                content,
                 img,
                 content,
                 user_id: userId
